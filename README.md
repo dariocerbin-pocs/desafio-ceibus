@@ -50,9 +50,12 @@ Prueba rápida:
 curl http://localhost:3000/example
 ```
 
-### Autenticación y ruta protegida
-- POST `http://localhost:3000/auth/token` emite un token de prueba.
-- GET `http://localhost:3000/secure` requiere `Authorization: Bearer <token>` y devuelve el `userId` del token.
+### Autenticación y rutas protegidas
+- POST `POST /auth/register` (registro con bcrypt, devuelve access token)
+- POST `POST /auth/login` (login con bcrypt, devuelve access token)
+- GET `GET /auth/me` (JWT)
+- GET `GET /users/me` (JWT)
+- GET `GET /secure` (JWT de prueba)
 
 Ejemplo rápido:
 ```bash
@@ -104,12 +107,23 @@ npm run prisma:generate
 npm run prisma:migrate -- --name init
 ```
 
+## Roles y permisos
+- ADMIN:
+  - CRUD de productos (`POST/PATCH/DELETE /products/:id`, `POST /products`)
+  - Ver todos los pedidos y cambiar estado (`GET /orders?status=`, `PATCH /orders/:id/status`)
+- USER:
+  - Crear pedidos (`POST /orders`)
+  - Ver sus propios pedidos (`GET /orders`)
+
+## Swagger
+Documentación interactiva en `http://localhost:3000/docs` con esquema y auth Bearer.
+
 ## Autenticación JWT (resumen)
 El proyecto incluye configuración de JWT (módulo de Auth, estrategia `jwt`, y guard `JwtAuthGuard`).
 - Para proteger rutas en el futuro, aplica el guard `JwtAuthGuard` en un controller/handler.
 - Para emitir tokens, puedes usar el `AuthService` (ejemplo simple `issueToken(userId)`).
 
-Nota: Por ahora el único endpoint público es `GET /example`. Las rutas protegidas se agregarán más adelante.
+Nota: Por ahora el único endpoint público es `GET /example`. 
 
 ## Estándares y calidad
 - Validación global con `ValidationPipe` (whitelist, forbidNonWhitelisted, transform)

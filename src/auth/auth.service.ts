@@ -21,7 +21,7 @@ export class AuthService {
     if (existing) throw new ConflictException('Email already registered');
     const password_hash = await bcrypt.hash(password, 10);
     const user = await this.usersService.create(email, password_hash, role);
-    return { access_token: this.issueToken(user.id, user.role as AppRole) };
+    return { access_token: this.issueToken(user.id.toString(), user.role as AppRole) };
   }
 
   async login(email: string, password: string) {
@@ -29,6 +29,6 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) throw new UnauthorizedException('Invalid credentials');
-    return { access_token: this.issueToken(user.id, user.role as AppRole) };
+    return { access_token: this.issueToken(user.id.toString(), user.role as AppRole) };
   }
 }

@@ -42,13 +42,11 @@ export class OrdersRepository {
     });
   }
 
-  findById(id: string | bigint) {
-    const bid = typeof id === 'bigint' ? id : BigInt(id);
-    return this.prisma.order.findUnique({ where: { id: bid }, include: { items: true } });
+  findById(id: bigint) {
+    return this.prisma.order.findUnique({ where: { id }, include: { items: true } });
   }
 
-  updateStatus(id: string | bigint, status: OrderStatusEnum) {
-    const bid = typeof id === 'bigint' ? id : BigInt(id);
-    return this.prisma.order.update({ where: { id: bid }, data: { status } });
+  updateStatus(id: bigint, status: OrderStatusEnum) {
+    return this.prisma.order.update({ where: { id }, data: { status } });
   }
 }
