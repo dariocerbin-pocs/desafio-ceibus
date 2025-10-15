@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    container_name: desafio-ceibus-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-please_change_me}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1h}
+    command: ["node", "dist/src/main.js"]
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
