@@ -9,8 +9,24 @@ services:
       - PORT=3000
       - JWT_SECRET=${JWT_SECRET:-please_change_me}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1h}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/ceibus-commerce?schema=public}
     command: ["node", "dist/src/main.js"]
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    container_name: desafio-ceibus-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ceibus-commerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:

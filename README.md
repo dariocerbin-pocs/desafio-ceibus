@@ -66,6 +66,7 @@ Copiar el archivo `.env.example` a `.env` y ajustar valores:
 PORT=3000
 JWT_SECRET=please_change_me
 JWT_EXPIRES_IN=1h
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ceibus-commerce?schema=public
 ```
 
 ## Scripts útiles
@@ -86,6 +87,22 @@ La API quedará disponible en `http://localhost:3000`.
 Variables inyectadas por Compose (puedes sobreescribir vía entorno):
 - `JWT_SECRET` (default: `please_change_me`)
 - `JWT_EXPIRES_IN` (default: `1h`)
+- `DATABASE_URL` (default: `postgresql://postgres:postgres@db:5432/ceibus-commerce?schema=public`)
+
+## Prisma ORM (PostgreSQL)
+- Esquema: `prisma/schema.prisma`
+- Scripts:
+  - `npm run prisma:generate` genera Prisma Client
+  - `npm run prisma:migrate` crea/ejecuta migraciones (usa la BD de `DATABASE_URL`)
+  - `npm run prisma:studio` abre Prisma Studio
+
+Pasos iniciales:
+```bash
+cp .env.example .env
+docker compose up -d db
+npm run prisma:generate
+npm run prisma:migrate -- --name init
+```
 
 ## Autenticación JWT (resumen)
 El proyecto incluye configuración de JWT (módulo de Auth, estrategia `jwt`, y guard `JwtAuthGuard`).

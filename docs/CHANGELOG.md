@@ -34,6 +34,15 @@ Este documento registra los pasos realizados y las funcionalidades agregadas al 
 - `AppModule` actualizado para importar `SecureModule`.
 - `README.md` actualizado con ejemplo de uso del token y ruta segura.
 
+## [2025-10-15] Integración Prisma + PostgreSQL
+- Dependencias: `prisma` (dev) y `@prisma/client`.
+- Scripts añadidos: `prisma:generate`, `prisma:migrate`, `prisma:studio`.
+- `prisma/schema.prisma` con modelos: `User`, `Product`, `Order`, `OrderItem` y enums `Role`, `OrderStatus`.
+- `PrismaModule` y `PrismaService` para DI en NestJS (global).
+- `docker-compose.yml` extendido con servicio `db` (PostgreSQL 16) y volumen `pgdata`.
+- `.env.example` actualizado con `DATABASE_URL`.
+- `README.md` con pasos para generar cliente y correr migraciones.
+
 ---
 
 Procedimiento para futuras actualizaciones:
