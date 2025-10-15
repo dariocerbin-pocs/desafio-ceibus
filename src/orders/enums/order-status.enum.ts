@@ -5,5 +5,3 @@ export enum OrderStatusEnum {
 }
 
 export type OrderStatusType = `${OrderStatusEnum}`;
-
-

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrderEntity } from './entities/order.entity';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatusEnum } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersRepository {
@@ -26,7 +26,7 @@ export class OrdersRepository {
     });
   }
 
-  findAllByUser(userId: bigint, status?: OrderStatus) {
+  findAllByUser(userId: bigint, status?: OrderStatusEnum) {
     return this.prisma.order.findMany({
       where: { user_id: userId, status },
       orderBy: { created_at: 'desc' },
@@ -34,7 +34,7 @@ export class OrdersRepository {
     });
   }
 
-  findAll(status?: OrderStatus) {
+  findAll(status?: OrderStatusEnum) {
     return this.prisma.order.findMany({
       where: { status },
       orderBy: { created_at: 'desc' },
@@ -42,11 +42,13 @@ export class OrdersRepository {
     });
   }
 
-  findById(id: string) {
-    return this.prisma.order.findUnique({ where: { id: BigInt(id) }, include: { items: true } });
+  findById(id: string | bigint) {
+    const bid = typeof id === 'bigint' ? id : BigInt(id);
+    return this.prisma.order.findUnique({ where: { id: bid }, include: { items: true } });
   }
 
-  updateStatus(id: string, status: OrderStatus) {
-    return this.prisma.order.update({ where: { id: BigInt(id) }, data: { status } });
+  updateStatus(id: string | bigint, status: OrderStatusEnum) {
+    const bid = typeof id === 'bigint' ? id : BigInt(id);
+    return this.prisma.order.update({ where: { id: bid }, data: { status } });
   }
 }

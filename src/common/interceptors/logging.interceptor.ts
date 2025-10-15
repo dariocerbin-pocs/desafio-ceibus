@@ -22,7 +22,9 @@ export class LoggingInterceptor implements NestInterceptor {
       }),
       catchError((err) => {
         const ms = Date.now() - started;
-        this.logger.error(`xxx ${method} ${url} ${ms}ms requestId=${requestId ?? '-'} error=${err?.message ?? err}`);
+        this.logger.error(
+          `xxx ${method} ${url} ${ms}ms requestId=${requestId ?? '-'} error=${err?.message ?? err}`,
+        );
         throw err;
       }),
     );

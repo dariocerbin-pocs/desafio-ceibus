@@ -2,7 +2,9 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nest
 import { Prisma } from '@prisma/client';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
-export class PrismaExceptionFilter implements ExceptionFilter<Prisma.PrismaClientKnownRequestError> {
+export class PrismaExceptionFilter
+  implements ExceptionFilter<Prisma.PrismaClientKnownRequestError>
+{
   private readonly logger = new Logger(PrismaExceptionFilter.name);
 
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {

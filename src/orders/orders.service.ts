@@ -1,8 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import type { CreateOrderDto } from './dto/create-order.dto';
 import type { OrderEntity } from './entities/order.entity';
 import { OrderStatusEnum } from './enums/order-status.enum';
-import { OrdersRepository } from './orders.repository.js';
+import { OrdersRepository } from './orders.repository';
+import { AppRole } from '../common/roles.enum';
 
 @Injectable()
 export class OrdersService {
@@ -16,7 +22,7 @@ export class OrdersService {
         status: 'PENDING',
         total_cents: 0,
         items: dto.items.map(
-          (i: { product_id: string | number | bigint | boolean; quantity: any }) => ({
+          (i: { product_id: string | number | bigint | boolean; quantity: number }) => ({
             product_id: BigInt(i.product_id),
             quantity: i.quantity,
           }),
@@ -31,12 +37,12 @@ export class OrdersService {
     }
   }
 
-  findAll(userId: bigint, filter: { status?: OrderStatusEnum }) {
+  findAll(userId: bigint, role: AppRole, filter: { status?: OrderStatusEnum }) {
     try {
-      if (filter.status) {
-        return this.ordersRepository.findAllByUser(userId, filter.status as any);
+      if (role === AppRole.ADMIN) {
+        return this.ordersRepository.findAll(filter.status);
       }
-      return this.ordersRepository.findAllByUser(userId, undefined);
+      return this.ordersRepository.findAllByUser(userId, filter.status);
     } catch (error: any) {
       throw new InternalServerErrorException({
         message: `error al buscar Orders`,
@@ -45,10 +51,14 @@ export class OrdersService {
     }
   }
 
-  findOne(userId: bigint, id: string) {
+  async findOne(userId: bigint, id: bigint, role?: AppRole) {
     try {
-      void userId; // reserved for access control checks
-      return this.ordersRepository.findById(id);
+      const order = await this.ordersRepository.findById(id);
+      if (!order) throw new NotFoundException('Order not found');
+      if (role !== AppRole.ADMIN && order.user_id !== userId) {
+        throw new ForbiddenException('Forbidden');
+      }
+      return order;
     } catch (error: any) {
       throw new InternalServerErrorException({
         message: `error al buscar Order id: ${id}`,
@@ -57,9 +67,9 @@ export class OrdersService {
     }
   }
 
-  updateStatus(id: string, status: OrderStatusEnum) {
+  updateStatus(id: bigint, status: OrderStatusEnum) {
     try {
-      return this.ordersRepository.updateStatus(id, status as any);
+      return this.ordersRepository.updateStatus(id, status);
     } catch (error: any) {
       throw new InternalServerErrorException({
         message: `error al actualizar Order status: ${id}`,

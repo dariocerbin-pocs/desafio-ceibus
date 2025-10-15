@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/roles.decorator';
 import { AppRole } from '../common/roles.enum';
 import { RolesGuard } from '../common/roles.guard';
-import { CreateOrderDto } from '../orders/dto/create-order.dto';
+import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderStatusEnum } from './enums/order-status.enum';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
@@ -15,27 +15,30 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AppRole.USER)
   @Post()
-  create(@Req() req: any, @Body() dto: CreateOrderDto) {
-    return this.ordersService.create(BigInt(req.user.userId), dto);
+  create(@Req() req: { user: { userId: bigint } }, @Body() dto: CreateOrderDto) {
+    return this.ordersService.create(req.user.userId, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  findAll(@Req() req: any, @Query('status') status?: string) {
+  findAll(
+    @Req() req: { user: { userId: bigint; role: AppRole } },
+    @Query('status') status?: string,
+  ) {
     const statusEnum = status as OrderStatusEnum | undefined;
-    return this.ordersService.findAll(BigInt(req.user.userId), { status: statusEnum });
+    return this.ordersService.findAll(req.user.userId, req.user.role, { status: statusEnum });
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Req() req: any, @Param('id') id: string) {
-    return this.ordersService.findOne(BigInt(req.user.userId), id);
+  findOne(@Req() req: { user: { userId: bigint; role: AppRole } }, @Param('id') id: bigint) {
+    return this.ordersService.findOne(req.user.userId, id, req.user.role);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AppRole.ADMIN)
   @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body() dto: UpdateOrderStatusDto) {
+  updateStatus(@Body() dto: UpdateOrderStatusDto, @Param('id') id: bigint) {
     return this.ordersService.updateStatus(id, dto.status);
   }
 }
