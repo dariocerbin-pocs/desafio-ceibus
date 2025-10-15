@@ -1,6 +1,7 @@
-import { IsIn } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { OrderStatusEnum } from '../enums/order-status.enum';
 
 export class UpdateOrderStatusDto {
-  @IsIn(['PAID', 'CANCELLED'])
-  status!: 'PAID' | 'CANCELLED';
+  @IsEnum(OrderStatusEnum)
+  status!: OrderStatusEnum;
 }

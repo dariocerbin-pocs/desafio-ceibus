@@ -4,7 +4,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/roles.decorator';
 import { AppRole } from '../common/roles.enum';
 import { RolesGuard } from '../common/roles.guard';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto } from '../orders/dto/create-order.dto';
+import { OrderStatusEnum } from './enums/order-status.enum';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('orders')
@@ -21,7 +22,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll(@Req() req: any, @Query('status') status?: string) {
-    return this.ordersService.findAll(BigInt(req.user.userId), { status });
+    const statusEnum = status as OrderStatusEnum | undefined;
+    return this.ordersService.findAll(BigInt(req.user.userId), { status: statusEnum });
   }
 
   @UseGuards(JwtAuthGuard)

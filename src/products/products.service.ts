@@ -1,26 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsRepository } from './products.repository';
 
 @Injectable()
 export class ProductsService {
+  constructor(private readonly productsRepository: ProductsRepository) {}
+
   create(dto: CreateProductDto) {
-    return { message: 'create product - not implemented', dto };
+    try {
+      return this.productsRepository.create(dto);
+    } catch (error: any) {
+      // Re-throw; filters/interceptors handle logging/formatting
+      throw new InternalServerErrorException({
+        message: `error al crear Product`,
+        error: error?.message ?? String(error),
+      });
+    }
   }
 
   findAll(filter: { q?: string; isActive?: string }) {
-    return { message: 'list products - not implemented', filter };
+    try {
+      return this.productsRepository.findAll({
+        q: filter.q,
+        isActive: typeof filter.isActive === 'string' ? filter.isActive === 'true' : undefined,
+      });
+    } catch (error: any) {
+      throw new InternalServerErrorException({
+        message: `error al buscar Product`,
+        error: error?.message ?? String(error),
+      });
+    }
   }
 
   findOne(id: bigint) {
-    return { message: 'get product - not implemented', id };
+    try {
+      return this.productsRepository.findById(id);
+    } catch (error: any) {
+      throw new InternalServerErrorException({
+        message: `error al buscar Product`,
+        error: error?.message ?? String(error),
+      });
+    }
   }
 
   update(id: bigint, dto: UpdateProductDto) {
-    return { message: 'update product - not implemented', id, dto };
+    try {
+      return this.productsRepository.update(id, dto);
+    } catch (error: any) {
+      throw new InternalServerErrorException({
+        message: `error al actualizar Product`,
+        error: error?.message ?? String(error),
+      });
+    }
   }
 
   remove(id: bigint) {
-    return { message: 'delete product - not implemented', id };
+    try {
+      return this.productsRepository.remove(id);
+    } catch (error: any) {
+      throw new InternalServerErrorException({
+        message: `error al eliminar Product`,
+        error: error?.message ?? String(error),
+      });
+    }
   }
 }

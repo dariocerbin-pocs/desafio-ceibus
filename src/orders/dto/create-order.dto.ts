@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsInt, Min, ValidateNested } from 'class-validator';
 
-class CreateOrderItemDto {
+export class CreateOrderItemDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
