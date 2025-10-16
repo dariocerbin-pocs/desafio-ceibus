@@ -71,6 +71,12 @@ Construir y levantar con Docker Compose:
 ```bash
 docker compose up --build
 ```
+
+### Logs - Quitar "| grep -i error" para ver todo 
+```bash
+docker compose logs -f api | grep -i error
+```
+
 La API quedará disponible en `http://localhost:3000`.
 
 Variables inyectadas por Compose (puedes sobreescribir vía entorno):

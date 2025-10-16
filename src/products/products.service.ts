@@ -55,6 +55,9 @@ export class ProductsService {
     try {
       return this.productsRepository.update(id, dto);
     } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException({
         message: `error al actualizar Product`,
         error: error?.message ?? String(error),
@@ -66,6 +69,9 @@ export class ProductsService {
     try {
       return this.productsRepository.remove(id);
     } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException({
         message: `error al eliminar Product`,
         error: error?.message ?? String(error),
