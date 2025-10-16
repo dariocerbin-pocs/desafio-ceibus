@@ -7,25 +7,6 @@ Proyecto base (scaffolding) de una API REST construida con NestJS (TypeScript), 
 - npm 9+
 - Docker y Docker Compose (opcional para ejecución en contenedor)
 
-## Estructura del proyecto
-```
-src/
-  app/
-    app.module.ts
-  auth/
-    auth.module.ts
-    auth.service.ts
-    jwt.strategy.ts
-    jwt-auth.guard.ts
-  example/
-    example.module.ts
-    example.controller.ts
-    example.service.ts
-    example.repository.ts
-  main.ts
-config/
-  configuration.ts
-```
 
 ## Instalación y ejecución local
 1) Instalar dependencias:
@@ -45,11 +26,6 @@ La API quedará disponible en `http://localhost:3000`.
 ### Endpoint de prueba
 - GET `http://localhost:3000/example`
 
-Prueba rápida:
-```bash
-curl http://localhost:3000/example
-```
-
 ### Autenticación y rutas protegidas
 - POST `POST /auth/register` (registro con bcrypt, devuelve access token)
 - POST `POST /auth/login` (login con bcrypt, devuelve access token)
@@ -64,13 +40,23 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/secure
 ```
 
 ## Variables de entorno
-Copiar el archivo `.env.example` a `.env` y ajustar valores:
+
+### Para desarrollo local:
+```bash
+cp .env.example .env
+# Configurar DATABASE_URL para localhost
+echo 'DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ceibus-commerce?schema=public' >> .env
 ```
-PORT=3000
-JWT_SECRET=please_change_me
-JWT_EXPIRES_IN=1h
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ceibus-commerce?schema=public
+
+### Para Docker:
+```bash
+# El docker-compose.yml ya incluye las variables correctas
+# No necesitas configurar .env para Docker
 ```
+
+**Nota**: 
+- **Desarrollo local**: Usa `localhost:5432` en DATABASE_URL
+- **Docker**: Usa `db:5432` (configurado automáticamente)
 
 ## Scripts útiles
 - `npm run build`: compila a `dist/`
@@ -98,13 +84,45 @@ Variables inyectadas por Compose (puedes sobreescribir vía entorno):
   - `npm run prisma:generate` genera Prisma Client
   - `npm run prisma:migrate` crea/ejecuta migraciones (usa la BD de `DATABASE_URL`)
   - `npm run prisma:studio` abre Prisma Studio
+  - `npm run prisma:seed` ejecuta el seeding de datos iniciales
 
-Pasos iniciales:
+Esto creará:
+- **1 usuario ADMIN**: `admin@ceibus.com` / `Admin123!`
+- **1 usuario USER**: `user@ceibus.com` / `User123!`
+- **3 productos**: Laptop Gaming ($1,500), Mouse Inalámbrico ($25), Teclado Mecánico ($80)
+
+### Prisma Studio
+Para abrir Prisma Studio (interfaz visual de la base de datos):
+
+**Opción recomendada (desde local):**
+```bash
+# Levantar solo la base de datos
+docker compose up -d db
+
+# Cambiar DATABASE_URL a localhost en .env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ceibus-commerce?schema=public"
+
+# Ejecutar Prisma Studio localmente
+npm run prisma:studio
+```
+Prisma Studio estará disponible en `http://localhost:5555`
+
+**Opción alternativa (desde Docker - requiere configuración adicional):**
+```bash
+# Levantar solo la base de datos
+docker compose up -d db
+
+# Ejecutar Prisma Studio desde el contenedor (puerto puede variar)
+docker compose exec api npm run prisma:studio
+```
+
+### Pasos iniciales completos:
 ```bash
 cp .env.example .env
 docker compose up -d db
 npm run prisma:generate
 npm run prisma:migrate -- --name init
+npm run prisma:seed
 ```
 
 ## Roles y permisos
