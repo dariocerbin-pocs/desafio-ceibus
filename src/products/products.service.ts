@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsRepository } from './products.repository';
@@ -33,10 +33,17 @@ export class ProductsService {
     }
   }
 
-  findOne(id: bigint) {
+  async findOne(id: bigint) {
     try {
-      return this.productsRepository.findById(id);
+      const product = await this.productsRepository.findById(id);
+      if (!product) {
+        throw new NotFoundException(`Product id ${id.toString()} not found`);
+      }
+      return product;
     } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException({
         message: `error al buscar Product`,
         error: error?.message ?? String(error),
